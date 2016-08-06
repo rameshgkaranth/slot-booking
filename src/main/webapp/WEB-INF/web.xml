@@ -1,0 +1,35 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
+
+    <display-name>Slot Booking App</display-name>
+    <description>Spring MVC based REST web application for booking a slot given an order</description>
+
+    <!-- For web context -->
+    <servlet>
+        <servlet-name>slot-booking</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/slot-booking-servlet.xml</param-value>
+		</init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>slot-booking</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!-- For root context -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/slot-booking-core.xml</param-value>
+    </context-param>
+
+</web-app>
