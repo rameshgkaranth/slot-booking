@@ -22,5 +22,56 @@ Gradle has been used as the build tool for this project. Jetty gradle plugin is 
 <code>heroku deploy:war <Path to WAR FILE> --app slot-booking</code>
 
 
-## Herko URL for deployed WAR
-https://slot-booking.herokuapp.com/
+## URL for deployed WAR
+[Heroku URL](https://slot-booking.herokuapp.com/)
+
+
+## Is App up and running ?
+[Is App Working](https://slot-booking.herokuapp.com/isWorking)
+
+## Endpoints
+### Available slots for Order
+* URL - http://slot-booking.herokuapp.com/slot/avaialable
+* Method Type - POST
+* Request Body
+    {
+      "orderId":1,
+      "items":[{
+          "itemId":1,
+          "height":10.0,
+          "breadth":10.0,
+          "width":10.0
+      },
+      {
+          "itemId":2,
+          "height":10.0,
+          "breadth":15.0,
+          "width":15.0
+      }]
+    }
+
+### Book a Slot for Order
+* URL - http://slot-booking.herokuapp.com/slot/book
+* Method Type - POST
+* Request Body
+    {
+        "order":{
+            "orderId":1,
+            "items":[{
+                "itemId":1,
+                "height":15.0,
+                "breadth":15.0,
+                "width":10.0
+            },
+            {
+                "itemId":2,
+                "height":15.0,
+                "breadth":15.0,
+                "width":10.0
+            }]
+        },
+        "slot":{
+            "startHour": 18,
+            "endHour":20
+        }
+    }
