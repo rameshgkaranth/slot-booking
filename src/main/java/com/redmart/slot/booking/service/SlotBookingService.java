@@ -25,6 +25,9 @@ import com.redmart.slot.booking.model.Van;
 import com.redmart.slot.booking.vo.SlotVO;
 
 /**
+ * Service that provides methods related booking slot and getting 
+ * available slots
+ * 
  * @author rkaranth
  *
  */
@@ -42,6 +45,14 @@ public class SlotBookingService implements ISlotBookingService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SlotBookingService.class);
 	
+	/**
+	 * 
+	 * @param slot
+	 * @param order
+	 * @return
+	 * 		{@code OrderShipmentInfo} representing booked slot for an Order with Van & Carton details
+	 * @throws Exception
+	 */
 	@Override
 	public OrderShipmentInfo bookSlotForOrder(Slot slot, Order order) throws Exception {
 		Map<Item, Carton> itemCartonMap = null;

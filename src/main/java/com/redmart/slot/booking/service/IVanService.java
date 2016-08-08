@@ -5,7 +5,6 @@ package com.redmart.slot.booking.service;
 
 import java.util.Map;
 
-import com.redmart.slot.booking.exception.VanCapacityOutOfBoundsException;
 import com.redmart.slot.booking.model.Carton;
 import com.redmart.slot.booking.model.Item;
 import com.redmart.slot.booking.model.Order;

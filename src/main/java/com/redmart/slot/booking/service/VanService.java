@@ -18,6 +18,9 @@ import com.redmart.slot.booking.model.Order;
 import com.redmart.slot.booking.model.Van;
 
 /**
+ * Service class that provides methods to add Order/Item(s) 
+ * to Carton. Also provides methods to check if such addition is possible
+ * 
  * @author rkaranth
  *
  */
@@ -28,28 +31,39 @@ public class VanService implements IVanService {
 	private ICartonService cartonService;
 	
 	/**
+	 * Service method to add Order to Van
+	 * 
+	 * @param order
+	 * @param van
+	 * @return 
+	 * 		{@code Map<Item, Carton>} 
 	 * @throws VanCapacityOutOfBoundsException 
 	 * @throws CloneNotSupportedException 
 	 * @throws SlotCapacityOutOfBoundsException 
-	 * 
 	 */
 	@Override
 	public Map<Item, Carton> addOrderToVan(Order order, Van van) throws VanCapacityOutOfBoundsException, CloneNotSupportedException, SlotCapacityOutOfBoundsException {
 		Map<Item, Carton> itemCartonMap = new HashMap<>();
 		Carton carton = null;
 		
-		if ((carton = addOrderToASingleCarton(order, van)) != null) {
-			itemCartonMap = prepareItemCartonMap(order.getItems(), carton);
-		} else {
-			//Create a clone to check if items can be accommodated in multiple cartons
-			Van clonedVan = (Van) van.clone();
-			itemCartonMap = addOrderToMultipleCarton(order, clonedVan);
-			
-			if (null == itemCartonMap || itemCartonMap.keySet().size() != order.getItems().size()) {
-				throw new SlotCapacityOutOfBoundsException("Order #:"+order.getOrderId()+" cannot be accomodated in this slot");
+		//Synchronize based on Van object (equality based on vanId)
+		synchronized (van) {
+			//Check if all items in Order can accommodated in a single carton of Van
+			if ((carton = addOrderToASingleCarton(order, van)) != null) {
+				itemCartonMap = prepareItemCartonMap(order.getItems(), carton);
 			} else {
-				//As we are sure that items can be accommodated across multiple cartons, use the original Van
-				itemCartonMap = addOrderToMultipleCarton(order, van);
+				//All Items in Order could not be accommodated in a Single carton
+				//Create a clone to check if items can be accommodated in multiple cartons
+				Van clonedVan = (Van) van.clone();
+				itemCartonMap = addOrderToMultipleCarton(order, clonedVan);
+				
+				//Check if all items of order are accommodated, else throw exception
+				if (null == itemCartonMap || itemCartonMap.keySet().size() != order.getItems().size()) {
+					throw new SlotCapacityOutOfBoundsException("Order #:"+order.getOrderId()+" cannot be accomodated in this slot");
+				} else {
+					//As we are sure that items can be accommodated across multiple cartons, use the original Van
+					itemCartonMap = addOrderToMultipleCarton(order, van);
+				}
 			}
 		}
 		
@@ -57,6 +71,13 @@ public class VanService implements IVanService {
 	}
 	
 	/**
+	 * Service invoked during availability check to determine if an Order can
+	 * be accommodated within Slot
+	 * 
+	 * @param order
+	 * @param van
+	 * @return
+	 * 		true if Order can be accommodated in a Van of a particular Slot, else false
 	 * @throws CloneNotSupportedException 
 	 * @throws VanCapacityOutOfBoundsException 
 	 * @throws SlotCapacityOutOfBoundsException 
@@ -65,24 +86,28 @@ public class VanService implements IVanService {
 	@Override
 	public boolean canAddOrderToVan(Order order, Van van) throws CloneNotSupportedException, VanCapacityOutOfBoundsException, SlotCapacityOutOfBoundsException {
 		boolean canAddOrderToVan = false;
-		for (Carton carton : van.getCartons()) {
-			canAddOrderToVan = cartonService.canCartonAccomodateOrder(order, carton);
-			
-			//One of the cartons can accommodate the order
-			if (canAddOrderToVan) break;
-		}
 		
-		//If all the items cannot be added into a single carton check
-		//if items can be separated and added to different Cartons
-		if (!canAddOrderToVan) {
-			Map<Item, Carton> itemCartonMap = new HashMap<>();
+		//Synchronize based on Van object (equality based on vanId)
+		synchronized (van) {
+			for (Carton carton : van.getCartons()) {
+				canAddOrderToVan = cartonService.canCartonAccomodateOrder(order, carton);
+				
+				//One of the cartons can accommodate the order
+				if (canAddOrderToVan) break;
+			}
 			
-			//Create a clone to check if items can be accommodated in multiple cartons
-			Van clonedVan = (Van) van.clone();
-			itemCartonMap = addOrderToMultipleCarton(order, clonedVan);
-			
-			if (null == itemCartonMap || itemCartonMap.keySet().size() != order.getItems().size()) {
-				throw new SlotCapacityOutOfBoundsException("Order #:"+order.getOrderId()+" cannot be accomodated in this slot");
+			//If all the items cannot be added into a single carton check
+			//if items can be separated and added to different Cartons
+			if (!canAddOrderToVan) {
+				Map<Item, Carton> itemCartonMap = new HashMap<>();
+				
+				//Create a clone to check if items can be accommodated in multiple cartons
+				Van clonedVan = (Van) van.clone();
+				itemCartonMap = addOrderToMultipleCarton(order, clonedVan);
+				
+				if (null == itemCartonMap || itemCartonMap.keySet().size() != order.getItems().size()) {
+					throw new SlotCapacityOutOfBoundsException("Order #:"+order.getOrderId()+" cannot be accomodated in this slot");
+				}
 			}
 		}
 		

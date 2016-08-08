@@ -14,6 +14,17 @@ public class Item {
 	private double breadth;
 	private double width;
 	
+	public Item() {
+		
+	}
+	
+	public Item (int itemId, double height, double breadth, double width) {
+		this.itemId = itemId;
+		this.height = height;
+		this.breadth = breadth;
+		this.width = width;
+	}
+	
 	/**
 	 * Method to get volume of Item
 	 * @return

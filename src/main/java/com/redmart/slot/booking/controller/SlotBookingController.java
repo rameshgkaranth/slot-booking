@@ -31,6 +31,9 @@ import com.redmart.slot.booking.vo.SlotBookingResponse;
 import com.redmart.slot.booking.vo.SlotVO;
 
 /**
+ * Controller for Booking a Slot given an order and 
+ * getting available slot options given an order
+ * 
  * @author rkaranth
  *
  */
@@ -49,6 +52,7 @@ public class SlotBookingController {
 	private final static Logger LOGGER = LoggerFactory.getLogger(SlotBookingController.class);
 
 	/**
+	 * Controller for booking an Order for a particular Slot
 	 * 
 	 * @param slotBookingRequest
 	 * @return
@@ -61,13 +65,18 @@ public class SlotBookingController {
 	public @ResponseBody SlotBookingResponse bookSlotForOrder(@RequestBody SlotBookingRequest slotBookingRequest) {
 		SlotBookingResponse slotBookingResponse = null;
 		try {
+			//Validate request
 			slotBookingRequestValidator.validateSlotBookingRequest(slotBookingRequest);
+			
+			//Get Slot & Try booking Slot with user given order
 			Order order = slotBookingRequest.getOrder();
 			Slot requiredSlot = slotBookingService.getSlotWithStartAndEndTime(slotBookingRequest.getSlot());
 			OrderShipmentInfo orderShipmentInfo = slotBookingService.bookSlotForOrder(requiredSlot, order);
 			
+			//Everything went well, log the order shipment information
 			LOGGER.debug("Order shipment info : "+orderShipmentInfo);
 			
+			//Build response message for success scenario
 			StringBuilder sb = new StringBuilder();
 			sb.append("Order #:").append(order.getOrderId()).append(" with ").append(order.getItems().size()).append(" items has been added to slot");
 			slotBookingResponse = new SlotBookingResponse(sb.toString(), HttpStatus.CREATED);
@@ -83,6 +92,7 @@ public class SlotBookingController {
 	
 	
 	/**
+	 * Controller for getting available Slots for a given Order
 	 * 
 	 * @param order
 	 * @return
@@ -97,13 +107,19 @@ public class SlotBookingController {
 		List<Slot> availableSlots = null;
 		List<SlotVO> availableSlotVOs = new ArrayList<>();
 		try {
+			//Validate request
 			availabilityRequestValidator.validateAvailabilityRequest(order);
+			
+			//Check available Slots by passing the Order
 			availableSlots = slotBookingService.getAvaialableSlotsForOrder(order);
+			
+			//Populate VO from available Slots
 			for (Slot slot : availableSlots) {
 				SlotVO slotVO = new SlotVO(slot.getStartHour(), slot.getEndHour());
 				availableSlotVOs.add(slotVO);
 			}
 			
+			//Build response message
 			StringBuilder sb = new StringBuilder();
 			sb.append("Order #:").append(order.getOrderId()).append(" has ").append(availableSlotVOs.size()).append(" available slots");
 			availabilityResponse = new SlotAvailabilityResponse(sb.toString(), HttpStatus.OK);

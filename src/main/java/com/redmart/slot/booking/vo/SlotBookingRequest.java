@@ -14,6 +14,18 @@ public class SlotBookingRequest {
 	private Order order;
 	private SlotVO slot;
 	
+	public SlotBookingRequest() {
+		
+	}
+	
+	/**
+	 * @param order
+	 * @param slot
+	 */
+	public SlotBookingRequest(Order order, SlotVO slot) {
+		this.order = order;
+		this.slot = slot;
+	}
 	/**
 	 * @return the order
 	 */
