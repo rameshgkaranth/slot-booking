@@ -105,7 +105,7 @@ public class SlotBookingService implements ISlotBookingService {
 		}
 		
 		if (availableSlots.size() == 0) {
-			throw new SlotCapacityOutOfBoundsException("Order #:"+order.getOrderId()+" has not avaialble slots to be accommodated");
+			throw new SlotCapacityOutOfBoundsException("Order #:"+order.getOrderId()+" has no avaialble slots to be accommodated");
 		}
 		
 		return availableSlots;

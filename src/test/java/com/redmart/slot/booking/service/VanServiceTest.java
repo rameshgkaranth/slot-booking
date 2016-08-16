@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.redmart.slot.booking.exception.VanCapacityOutOfBoundsException;
 import com.redmart.slot.booking.model.Carton;
 import com.redmart.slot.booking.model.Item;
 import com.redmart.slot.booking.model.Order;
@@ -66,7 +67,7 @@ public class VanServiceTest {
 		Assert.assertNotNull(itemCartonMap);
 	}
 	
-	/*@Test
+	@Test(expected = VanCapacityOutOfBoundsException.class)
 	public void throwsExceptionIfVanCannotAccommodateOrder() throws Exception {
 		Item item1 = new Item(121, 12.0, 15.0, 15.0);
 		Item item2 = new Item(123, 10.0, 10.5, 15.0);
@@ -77,10 +78,14 @@ public class VanServiceTest {
 		Order order = new Order(123, items);
 		
 		EasyMock.expect(cartonService.addOrderToCarton(EasyMock.isA(Order.class), 
-				EasyMock.isA(Carton.class))).times(items.size()).andReturn(null).times(items.size());
+				EasyMock.isA(Carton.class))).andReturn(null).times(items.size());
+		
+		EasyMock.expect(cartonService.addItemToCarton(EasyMock.isA(Item.class), 
+				EasyMock.isA(Carton.class))).andReturn(null).times(items.size());
+		
 		EasyMock.replay(cartonService);
 		
 		Map<Item, Carton> itemCartonMap = vanService.addOrderToVan(order, van);
 		Assert.assertNull(itemCartonMap);
-	}*/
+	}
 }
